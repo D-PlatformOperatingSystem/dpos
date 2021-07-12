@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+//
+message TotalFee {
+    int64 fee     = 1;
+    int64 txCount = 2;
+}
+
+//  symbol
+message ReqGetTotalCoins {
+    string symbol    = 1;
+    bytes  stateHash = 2;
+    bytes  startKey  = 3;
+    int64  count     = 4;
+    string execer    = 5;
+}
+
+//  symbol
+message ReplyGetTotalCoins {
+    int64 count   = 1;
+    int64 num     = 2;
+    int64 amount  = 3;
+    bytes nextKey = 4;
+}
+
+//    symbol
+message IterateRangeByStateHash {
+    bytes stateHash = 1;
+    bytes start     = 2;
+    bytes end       = 3;
+    int64 count     = 4;
+}
+
+message TotalAmount {
+    //
+    int64 total = 1;
+}
+
+//  symbol         ，  execAddr  ，    symbol
+message ReqGetExecBalance {
+    string symbol    = 1;
+    bytes  stateHash = 2;
+    bytes  addr      = 3;
+    bytes  execAddr  = 4;
+    string execer    = 5;
+    int64  count     = 6;
+    bytes  nextKey   = 7;
+}
+
+message ExecBalanceItem {
+    bytes execAddr = 1;
+    int64 frozen   = 2;
+    int64 active   = 3;
+}
+
+//  symbol
+message ReplyGetExecBalance {
+    int64    amount                = 1;
+    int64    amountFrozen          = 2;
+    int64    amountActive          = 3;
+    bytes    nextKey               = 4;
+    repeated ExecBalanceItem items = 5;
+}

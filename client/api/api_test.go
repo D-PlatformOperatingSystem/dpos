@@ -1,0 +1,96 @@
+package api
+
+import (
+	"errors"
+	"testing"
+	"time"
+
+	"google.golang.org/grpc/codes"
+
+	"github.com/D-PlatformOperatingSystem/dpos/client/mocks"
+	"github.com/D-PlatformOperatingSystem/dpos/queue"
+	qmocks "github.com/D-PlatformOperatingSystem/dpos/queue/mocks"
+	"github.com/D-PlatformOperatingSystem/dpos/rpc"
+	"github.com/D-PlatformOperatingSystem/dpos/rpc/grpcclient"
+	"github.com/D-PlatformOperatingSystem/dpos/types"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/status"
+)
+
+func TestAPI(t *testing.T) {
+	api := new(mocks.QueueProtocolAPI)
+	cfg := types.NewDplatformOSConfig(types.GetDefaultCfgstring())
+	gapi, err := grpcclient.NewMainChainClient(cfg, "")
+	assert.Nil(t, err)
+	api.On("GetConfig", mock.Anything).Return(cfg)
+	eapi := New(api, gapi)
+	param := &types.ReqHashes{
+		Hashes: [][]byte{[]byte("hello")},
+	}
+	api.On("GetBlockByHashes", mock.Anything).Return(&types.BlockDetails{}, nil)
+	detail, err := eapi.GetBlockByHashes(param)
+	assert.Nil(t, err)
+	assert.Equal(t, detail, &types.BlockDetails{})
+	param2 := &types.ReqRandHash{
+		ExecName: "ticket",
+		BlockNum: 5,
+		Hash:     []byte("hello"),
+	}
+	api.On("Query", "ticket", "RandNumHash", mock.Anything).Return(&types.ReplyHash{Hash: []byte("hello")}, nil)
+	randhash, err := eapi.GetRandNum(param2)
+	assert.Nil(t, err)
+	assert.Equal(t, randhash, []byte("hello"))
+	assert.Equal(t, false, eapi.IsErr())
+	api.On("QueryTx", mock.Anything).Return(&types.TransactionDetail{Height: 1}, nil)
+	param3 := &types.ReqHash{Hash: []byte("hash")}
+	txdetail, err := eapi.QueryTx(param3)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), txdetail.Height)
+	cfg.SetTitleOnlyForTest("user.p.wzw.")
+	//testnode setup
+	rpcCfg := new(types.RPC)
+	rpcCfg.GrpcBindAddr = "127.0.0.1:8003"
+	rpcCfg.JrpcBindAddr = "127.0.0.1:8004"
+	rpcCfg.Whitelist = []string{"127.0.0.1", "0.0.0.0"}
+	rpcCfg.JrpcFuncWhitelist = []string{"*"}
+	rpcCfg.GrpcFuncWhitelist = []string{"*"}
+	rpc.InitCfg(rpcCfg)
+	qc := &qmocks.Client{}
+	qc.On("GetConfig", mock.Anything).Return(cfg)
+	server := rpc.NewGRpcServer(qc, api)
+	assert.NotNil(t, server)
+	go server.Listen()
+	time.Sleep(time.Second)
+
+	eapi = New(api, gapi)
+	_, err = eapi.GetBlockByHashes(param)
+	assert.Equal(t, true, IsGrpcError(err))
+	assert.Equal(t, true, IsGrpcError(status.New(codes.Aborted, "operation is abort").Err()))
+	assert.Equal(t, false, IsGrpcError(nil))
+	assert.Equal(t, false, IsGrpcError(errors.New("xxxx")))
+	assert.Equal(t, true, eapi.IsErr())
+	assert.Equal(t, true, IsFatalError(types.ErrConsensusHashErr))
+	assert.Equal(t, false, IsFatalError(errors.New("xxxx")))
+
+	gapi2, err := grpcclient.NewMainChainClient(cfg, "127.0.0.1:8003")
+	assert.Nil(t, err)
+	eapi = New(api, gapi2)
+	detail, err = eapi.GetBlockByHashes(param)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, detail, &types.BlockDetails{})
+	randhash, err = eapi.GetRandNum(param2)
+	assert.Nil(t, err)
+	assert.Equal(t, randhash, []byte("hello"))
+	assert.Equal(t, false, eapi.IsErr())
+	param3 = &types.ReqHash{Hash: []byte("hash")}
+	txdetail, err = eapi.QueryTx(param3)
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), txdetail.Height)
+	//queue err
+	assert.Equal(t, false, IsQueueError(nil))
+	assert.Equal(t, false, IsQueueError(errors.New("xxxx")))
+	assert.Equal(t, true, IsQueueError(queue.ErrQueueTimeout))
+	assert.Equal(t, true, IsQueueError(queue.ErrIsQueueClosed))
+	assert.Equal(t, false, IsQueueError(errors.New("ErrIsQueueClosed")))
+}

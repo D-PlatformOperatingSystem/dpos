@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  dplatformos:
+    build:
+      context: .
+
+  chain32:
+    build:
+      context: .
+    command: ["/root/dplatformos", "-f", "/root/dplatformos-solo.toml"]
+
+  chain31:
+    build:
+      context: .
+    command: ["/root/dplatformos", "-f", "/root/dplatformos-solo.toml"]
+
+  chain30:
+    build:
+      context: .
+    command: ["/root/dplatformos", "-f", "/root/dplatformos-solo.toml"]
+
+  chain29:
+    build:
+      context: .
+    command: ["/root/dplatformos", "-f", "/root/dplatformos-solo.toml"]
+
+  chain28:
+    build:
+      context: .
+    command: ["/root/dplatformos", "-f", "/root/dplatformos-solo.toml"]

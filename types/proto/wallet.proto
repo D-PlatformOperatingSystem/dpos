@@ -1,0 +1,237 @@
+syntax = "proto3";
+
+import "transaction.proto";
+import "account.proto";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+//       tx
+// 	 tx : tx
+//	 receipt :
+//	 height :
+//	 index :
+//	 blocktime :
+//	 amount :
+//	 fromaddr :
+//	 txhash :
+//	 actionName  :
+//   payload:          ，
+message WalletTxDetail {
+    Transaction tx         = 1;
+    ReceiptData receipt    = 2;
+    int64       height     = 3;
+    int64       index      = 4;
+    int64       blocktime  = 5;
+    int64       amount     = 6;
+    string      fromaddr   = 7;
+    bytes       txhash     = 8;
+    string      actionName = 9;
+    bytes       payload    = 10;
+}
+
+message WalletTxDetails {
+    repeated WalletTxDetail txDetails = 1;
+}
+
+//
+// 	 privkey :
+//	 label :
+//	 addr :
+//	 timeStamp :
+message WalletAccountStore {
+    string privkey   = 1;
+    string label     = 2;
+    string addr      = 3;
+    string timeStamp = 4;
+}
+
+//
+// 	 pwHash :
+//	 randstr :
+message WalletPwHash {
+    bytes  pwHash  = 1;
+    string randstr = 2;
+}
+
+//
+// 	 isWalletLock :        ，true  ，false
+//	 isAutoMining :          ，true    ，false
+// 	 isHasSeed :        ，true  ，false
+//	 isTicketLock :         ，true  ，false  ，
+message WalletStatus {
+    bool isWalletLock = 1;
+    bool isAutoMining = 2;
+    bool isHasSeed    = 3;
+    bool isTicketLock = 4;
+}
+
+message WalletAccounts {
+    repeated WalletAccount wallets = 1;
+}
+
+//
+// 	 acc :
+//	 label :
+
+message WalletAccount {
+    Account acc   = 1;
+    string  label = 2;
+}
+
+//
+// 	 passwd :
+//	 timeout :      ，0，    ， 0 ，
+//	 walletOrTicket :                 ，1       ，0
+message WalletUnLock {
+    string passwd         = 1;
+    int64  timeout        = 2;
+    bool   walletOrTicket = 3;
+}
+
+message GenSeedLang {
+    int32 lang = 1;
+}
+
+message GetSeedByPw {
+    string passwd = 1;
+}
+
+//
+// 	 seed :
+//	 passwd :
+message SaveSeedByPw {
+    string seed   = 1;
+    string passwd = 2;
+}
+
+message ReplySeed {
+    string seed = 1;
+}
+
+message ReqWalletSetPasswd {
+    string oldPass = 1;
+    string newPass = 2;
+}
+
+message ReqNewAccount {
+    string label = 1;
+}
+
+//  label
+message ReqGetAccount {
+    string label = 1;
+}
+
+//
+// 	 fromTx : []byte( Sprintf("%018d", height*100000 + index)，
+//				      height    index         ；
+//			           ，       。)
+//	 count :         。
+//	 direction :    ；0，   ；1，   。
+message ReqWalletTransactionList {
+    bytes fromTx    = 1;
+    int32 count     = 2;
+    int32 direction = 3;
+}
+
+message ReqWalletImportPrivkey {
+    // bitcoin
+    string privkey = 1;
+    string label   = 2;
+}
+
+//
+// 	 from :
+//	 to :
+// 	 amount :
+//	 note :
+message ReqWalletSendToAddress {
+    string from        = 1;
+    string to          = 2;
+    int64  amount      = 3;
+    string note        = 4;
+    bool   isToken     = 5;
+    string tokenSymbol = 6;
+}
+
+message ReqWalletSetFee {
+    int64 amount = 1;
+}
+
+message ReqWalletSetLabel {
+    string addr  = 1;
+    string label = 2;
+}
+
+message ReqWalletMergeBalance {
+    string to = 1;
+}
+
+message ReqTokenPreCreate {
+    string creator_addr = 1;
+    string name         = 2;
+    string symbol       = 3;
+    string introduction = 4;
+    string owner_addr   = 5;
+    int64  total        = 6;
+    int64  price        = 7;
+}
+
+message ReqTokenFinishCreate {
+    string finisher_addr = 1;
+    string symbol        = 2;
+    string owner_addr    = 3;
+}
+
+message ReqTokenRevokeCreate {
+    string revoker_addr = 1;
+    string symbol       = 2;
+    string owner_addr   = 3;
+}
+
+message ReqModifyConfig {
+    string key      = 1;
+    string op       = 2;
+    string value    = 3;
+    string modifier = 4;
+}
+
+message ReqSignRawTx {
+    string addr    = 1;
+    string privkey = 2;
+    string txHex   = 3;
+    string expire  = 4;
+    int32  index   = 5;
+    //
+    // 0：
+    // 1：
+    // int32  mode  = 6;
+    string token = 7;
+    int64  fee   = 8;
+    // bytes  newExecer = 9;
+    string newToAddr = 10;
+}
+
+message ReplySignRawTx {
+    string txHex = 1;
+}
+
+message ReportErrEvent {
+    string frommodule = 1;
+    string tomodule   = 2;
+    string error      = 3;
+}
+
+message Int32 {
+    int32 data = 1;
+}
+
+message ReqAccountList {
+    bool withoutBalance = 1;
+}
+
+message ReqPrivkeysFile {
+    string fileName = 1;
+    string passwd   = 2;
+}

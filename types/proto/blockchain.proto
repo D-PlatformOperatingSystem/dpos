@@ -1,0 +1,393 @@
+syntax = "proto3";
+import "transaction.proto";
+import "common.proto";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+//
+// 	 version :
+//	 parentHash :
+// 	 txHash :
+//	 stateHash :
+// 	 height :
+//	 blockTime :
+// 	 txCount :
+//	 difficulty :      ，
+//	 signature :
+message Header {
+    int64     version    = 1;
+    bytes     parentHash = 2;
+    bytes     txHash     = 3;
+    bytes     stateHash  = 4;
+    int64     height     = 5;
+    int64     blockTime  = 6;
+    int64     txCount    = 9;
+    bytes     hash       = 10;
+    uint32    difficulty = 11;
+    Signature signature  = 8;
+}
+//    Header
+// mainHash          ，         hash
+message Block {
+    int64     version        = 1;
+    bytes     parentHash     = 2;
+    bytes     txHash         = 3;
+    bytes     stateHash      = 4;
+    int64     height         = 5;
+    int64     blockTime      = 6;
+    uint32    difficulty     = 11;
+    bytes     mainHash       = 12;
+    int64     mainHeight     = 13;
+    Signature signature      = 8;
+    repeated Transaction txs = 7;
+}
+
+message Blocks {
+    repeated Block items = 1;
+}
+
+message BlockSeq {
+    int64         num    = 1;
+    BlockSequence seq    = 2;
+    BlockDetail   detail = 3;
+}
+
+message BlockSeqs {
+    repeated BlockSeq seqs = 1;
+}
+
+//  ID     Block
+message BlockPid {
+    string pid   = 1;
+    Block  block = 2;
+}
+// resp
+message BlockDetails {
+    repeated BlockDetail items = 1;
+}
+
+// resp
+message Headers {
+    repeated Header items = 1;
+}
+
+message HeadersPid {
+    string  pid     = 1;
+    Headers headers = 2;
+}
+
+//
+// 	 head :
+//	 txCount :
+// 	 txHashes :
+message BlockOverview {
+    Header   head           = 1;
+    int64    txCount        = 2;
+    repeated bytes txHashes = 3;
+}
+
+//
+// 	 block :
+//	 receipts :
+message BlockDetail {
+    Block    block                   = 1;
+    repeated ReceiptData receipts    = 2;
+    repeated KeyValue KV             = 3;
+    bytes             prevStatusHash = 4;
+}
+
+message Receipts {
+    repeated Receipt receipts = 1;
+}
+
+message ReceiptCheckTxList {
+    repeated string errs = 1;
+}
+
+//
+// 	 currentHeight :
+//	 mempoolSize :
+// 	 msgQueueSize :
+message ChainStatus {
+    int64 currentHeight = 1;
+    int64 mempoolSize   = 2;
+    int64 msgQueueSize  = 3;
+}
+
+//
+// 	 start :
+//	 end :
+// 	 Isdetail :
+// 	 pid : peer
+message ReqBlocks {
+    int64    start      = 1;
+    int64    end        = 2;
+    bool     isDetail   = 3;
+    repeated string pid = 4;
+}
+
+message MempoolSize {
+    int64 size = 1;
+}
+
+message ReplyBlockHeight {
+    int64 height = 1;
+}
+
+//
+// 	 txs :
+//	 receipts :
+// 	 mainHash :     hash，
+//	 mainHeight :      ，
+// 	 hash :     hash
+//	 height :
+message BlockBody {
+    repeated Transaction txs        = 1;
+    repeated ReceiptData receipts   = 2;
+    bytes                mainHash   = 3;
+    int64                mainHeight = 4;
+    bytes                hash       = 5;
+    int64                height     = 6;
+}
+
+//
+//	 receipts :
+// 	 hash :     hash
+//	 height :
+message BlockReceipt {
+    repeated ReceiptData receipts = 1;
+    bytes                hash     = 2;
+    int64                height   = 3;
+}
+
+//          ，
+message IsCaughtUp {
+    bool Iscaughtup = 1;
+}
+
+//  ntp
+message IsNtpClockSync {
+    bool isntpclocksync = 1;
+}
+
+message ChainExecutor {
+    string driver    = 1;
+    string funcName  = 2;
+    bytes  stateHash = 3;
+    bytes  param     = 4;
+    //    ，
+    bytes extra = 5;
+}
+
+//    block hash  block      add/del：1/2
+message BlockSequence {
+    bytes Hash = 1;
+    int64 Type = 2;
+}
+
+// resp
+message BlockSequences {
+    repeated BlockSequence items = 1;
+}
+
+//
+// 	 blockdetail :
+//	 sequence :
+//   isSync:
+message ParaChainBlockDetail {
+    BlockDetail blockdetail = 1;
+    int64       sequence    = 2;
+    bool        isSync      = 3;
+}
+
+//   para
+message ParaTxDetails {
+    repeated ParaTxDetail items = 1;
+}
+
+// type:         add/del  ，
+// header:
+// txDetails:      title
+// proofs:      roothash
+// childHash:        roothash
+// index:      roothash
+message ParaTxDetail {
+    int64    type               = 1;
+    Header   header             = 2;
+    repeated TxDetail txDetails = 3;
+    bytes             childHash = 4;
+    uint32            index     = 5;
+    repeated bytes proofs       = 6;
+}
+
+//     ：
+// index:    block    ，  proof
+// tx:
+// receipt:
+// proofs:   hash block merkel
+message TxDetail {
+    uint32      index     = 1;
+    Transaction tx        = 2;
+    ReceiptData receipt   = 3;
+    repeated bytes proofs = 4;
+}
+
+//  seq   title
+message ReqParaTxByTitle {
+    int64  start = 1;
+    int64  end   = 2;
+    string title = 3;
+    bool   isSeq = 4;
+}
+
+//  block
+message FileHeader {
+    int64  startHeight = 1;
+    string driver      = 2;
+    string title       = 3;
+    bool   testNet     = 4;
+}
+//  block   hash
+message EndBlock {
+    int64 height = 1;
+    bytes hash   = 2;
+}
+
+//  seq     header
+message HeaderSeq {
+    int64         num    = 1;
+    BlockSequence seq    = 2;
+    Header        header = 3;
+}
+
+//       header
+message HeaderSeqs {
+    repeated HeaderSeq seqs = 1;
+}
+
+//                 hash
+// childHash:    roothash
+// startIndex:           index
+// childHashIndex:     roothash
+// txCount:
+message HeightPara {
+    int64  height         = 1;
+    string title          = 2;
+    bytes  hash           = 3;
+    bytes  childHash      = 4;
+    int32  startIndex     = 5;
+    uint32 childHashIndex = 6;
+    int32  txCount        = 7;
+}
+
+message HeightParas {
+    repeated HeightPara items = 1;
+}
+
+//           index,      roothash
+// title:    ，      main
+// startIndex:
+// childHash:    hash
+// txCount:
+message ChildChain {
+    string title      = 1;
+    int32  startIndex = 2;
+    bytes  childHash  = 3;
+    int32  txCount    = 4;
+}
+
+//    title  height       title
+message ReqHeightByTitle {
+    int64  height    = 1;
+    string title     = 2;
+    int32  count     = 3;
+    int32  direction = 4;
+}
+
+message ReplyHeightByTitle {
+    string   title           = 1;
+    repeated BlockInfo items = 2;
+}
+
+// title
+message BlockInfo {
+    int64 height = 1;
+    bytes hash   = 2;
+}
+
+//       title
+message ReqParaTxByHeight {
+    repeated int64 items = 1;
+    string         title = 2;
+}
+
+//
+message CmpBlock {
+    Block block   = 1;
+    bytes cmpHash = 2;
+}
+
+// BlockBodys
+message BlockBodys {
+    repeated BlockBody items = 1;
+}
+
+// ChunkRecords
+message ChunkRecords {
+    repeated ChunkInfo infos = 1;
+}
+
+// ChunkInfoMsg
+message ChunkInfoMsg {
+    bytes chunkHash = 1;
+    int64 start     = 2;
+    int64 end       = 3;
+}
+
+// ChunkInfo    chunk
+message ChunkInfo {
+    int64 chunkNum  = 1;
+    bytes chunkHash = 2;
+    int64 start     = 3;
+    int64 end       = 4;
+}
+
+//  ChunkRecord
+// 	 start :   Chunk
+//	 end :  Chunk
+// 	 Isdetail :         Chunk Record   ，false     chunkNum--->chunkhash KV ，true
+// 	 pid : peer
+message ReqChunkRecords {
+    int64    start      = 1;
+    int64    end        = 2;
+    bool     isDetail   = 3;
+    repeated string pid = 4;
+}
+
+message PushSubscribeReq {
+    string name          = 1;
+    string URL           = 2;
+    string encode        = 3;
+    int64  lastSequence  = 4;
+    int64  lastHeight    = 5;
+    string lastBlockHash = 6;
+    // 0:    ；1:       ；2：
+    int32 type = 7;
+    //
+    map<string, bool> contract = 8;
+}
+
+message PushWithStatus {
+    PushSubscribeReq push   = 1;
+    int32            status = 2;
+}
+
+message PushSubscribes {
+    repeated PushSubscribeReq pushes = 1;
+}
+
+message ReplySubscribePush {
+    bool   isOk = 1;
+    string msg  = 2;
+}

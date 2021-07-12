@@ -1,0 +1,124 @@
+Title="DOM"
+FixTime=false
+TxHeight=false
+
+[log]
+#     ，  debug(dbug)/info/warn/error(eror)/crit
+loglevel = "debug"
+logConsoleLevel = "info"
+#      ，    ，
+logFile = "logs/dplatformos.log"
+#           （  ： ）
+maxFileSize = 300
+#
+maxBackups = 100
+#            （  ： ）
+maxAge = 28
+#              （    UTC  ）
+localTime = true
+#           （     gz）
+compress = true
+#
+callerFile = false
+#
+callerFunction = false
+
+[blockchain]
+#
+dbPath="datadir"
+#
+dbCache=64
+#            ，         ，             false，
+batchsync=false
+#                ，         ，          ，     true
+isRecordBlockSequence=false
+enableTxQuickIndex=false
+#   storedb      localdb
+enableReExecLocal=false
+
+[p2p]
+# p2p
+types=[ "dht"]
+#
+dbPath="datadir/addrbook"
+#
+dbCache=4
+# GRPC
+grpcLogFile="grpc.log"
+#waitPid   seed
+waitPid=false
+
+
+[p2p.sub.dht]
+
+[rpc]
+# jrpc
+jrpcBindAddr="localhost:28803"
+# grpc
+grpcBindAddr="localhost:28804"
+#      ，     IP  ，   “*”，    IP
+whitelist=["127.0.0.1"]
+# jrpc       ，   “*”，      RPC
+jrpcFuncWhitelist=["*"]
+# grpc       ，   “*”，      RPC
+grpcFuncWhitelist=["*"]
+#     https
+enableTLS=false
+#     ，          cli
+certFile="cert.pem"
+#
+keyFile="key.pem"
+
+[mempool]
+#      mempool        ，  100
+maxTxNumPerAccount=100
+#          ，       ，  ，   0.0001 coins
+minTxFeeRate=10000
+#          , 0.1 coins
+maxTxFeeRate=10000000
+#           , 10 coins
+maxTxFee=1000000000
+
+[store]
+#
+dbPath="datadir/mavltree"
+# Cache
+dbCache=128
+
+[store.sub.mavl]
+#     mavl
+enableMavlPrefix=false
+#     MVCC,  mavl enableMVCC true     true
+enableMVCC=false
+#     mavl
+enableMavlPrune=false
+#
+pruneHeight=10000
+#     mavl
+enableMemTree=false
+#     mavl
+enableMemVal=false
+#   close ticket  ，           ，     1500000
+tkCloseCacheLen=100000
+
+[wallet]
+# walletdb
+dbPath="wallet"
+# walletdb
+dbCache=16
+
+[wallet.sub.ticket]
+#     ticket    ，  false
+minerdisable=false
+#     ticket        ，    “*”，
+minerwhitelist=["*"]
+
+[exec]
+#    stat
+enableStat=false
+#    MVCC
+enableMVCC=false
+
+[exec.sub.token]
+#    token
+saveTokenTxList=false

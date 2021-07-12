@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+import "common.proto";
+import "transaction.proto";
+import "blockchain.proto";
+import "wallet.proto";
+import "p2p.proto";
+import "account.proto";
+import "executor.proto";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+service dplatformos {
+    // dplatformos
+    //
+    rpc GetBlocks(ReqBlocks) returns (Reply) {}
+    //
+    rpc GetLastHeader(ReqNil) returns (Header) {}
+    //
+    rpc CreateRawTransaction(CreateTx) returns (UnsignTx) {}
+    rpc CreateRawTxGroup(CreateTransactionGroup) returns (UnsignTx) {}
+    //
+    rpc QueryTransaction(ReqHash) returns (TransactionDetail) {}
+    //
+    rpc SendTransaction(Transaction) returns (Reply) {}
+
+    //
+    rpc GetTransactionByAddr(ReqAddr) returns (ReplyTxInfos) {}
+
+    //
+    rpc GetTransactionByHashes(ReqHashes) returns (TransactionDetails) {}
+
+    //
+    rpc GetMemPool(ReqGetMempool) returns (ReplyTxList) {}
+
+    //
+    //
+    rpc GetAccounts(ReqNil) returns (WalletAccounts) {}
+
+    //    lable
+    rpc GetAccount(ReqGetAccount) returns (WalletAccount) {}
+
+    //
+    rpc NewAccount(ReqNewAccount) returns (WalletAccount) {}
+
+    //
+    rpc WalletTransactionList(ReqWalletTransactionList) returns (WalletTxDetails) {}
+
+    //
+    rpc ImportPrivkey(ReqWalletImportPrivkey) returns (WalletAccount) {}
+
+    //
+    rpc SendToAddress(ReqWalletSendToAddress) returns (ReplyHash) {}
+
+    //
+    rpc SetTxFee(ReqWalletSetFee) returns (Reply) {}
+
+    //
+    rpc SetLabl(ReqWalletSetLabel) returns (WalletAccount) {}
+
+    //
+    rpc MergeBalance(ReqWalletMergeBalance) returns (ReplyHashes) {}
+
+    //
+    rpc SetPasswd(ReqWalletSetPasswd) returns (Reply) {}
+
+    //
+    rpc Lock(ReqNil) returns (Reply) {}
+
+    //
+    rpc UnLock(WalletUnLock) returns (Reply) {}
+
+    //     Mempool
+    rpc GetLastMemPool(ReqNil) returns (ReplyTxList) {}
+
+    //     ProperFee
+    rpc GetProperFee(ReqProperFee) returns (ReplyProperFee) {}
+
+    //
+    rpc GetWalletStatus(ReqNil) returns (WalletStatus) {}
+    //
+    ///
+    rpc GetBlockOverview(ReqHash) returns (BlockOverview) {}
+    rpc GetAddrOverview(ReqAddr) returns (AddrOverview) {}
+    rpc GetBlockHash(ReqInt) returns (ReplyHash) {}
+    // seed
+    //   seed
+    rpc GenSeed(GenSeedLang) returns (ReplySeed) {}
+    //  seed
+    rpc GetSeed(GetSeedByPw) returns (ReplySeed) {}
+
+    //  seed
+    rpc SaveSeed(SaveSeedByPw) returns (Reply) {}
+    // Balance Query
+    //
+    rpc GetBalance(ReqBalance) returns (Accounts) {}
+
+    rpc QueryChain(ChainExecutor) returns (Reply) {}
+    rpc ExecWallet(ChainExecutor) returns (Reply) {}
+    rpc QueryConsensus(ChainExecutor) returns (Reply) {}
+
+    rpc CreateTransaction(CreateTxIn) returns (UnsignTx) {}
+    //
+    rpc GetHexTxByHash(ReqHash) returns (HexTx) {}
+
+    //
+    rpc DumpPrivkey(ReqString) returns (ReplyString) {}
+
+    //
+    rpc DumpPrivkeysFile(ReqPrivkeysFile) returns (Reply) {}
+    //
+    rpc ImportPrivkeysFile(ReqPrivkeysFile) returns (Reply) {}
+
+    //
+    rpc Version(ReqNil) returns (VersionInfo) {}
+
+    //
+    rpc IsSync(ReqNil) returns (Reply) {}
+
+    //
+    rpc GetPeerInfo(P2PGetPeerReq) returns (PeerList) {}
+
+    //
+    rpc NetInfo(P2PGetNetInfoReq) returns (NodeNetInfo) {}
+
+    // ntpclock
+    rpc IsNtpClockSync(ReqNil) returns (Reply) {}
+
+    //
+    rpc GetFatalFailure(types.ReqNil) returns (Int32) {}
+    rpc GetLastBlockSequence(ReqNil) returns (Int64) {}
+
+    // get add block's sequence by hash
+    rpc GetSequenceByHash(ReqHash) returns (Int64) {}
+
+    //  block hash      blocks
+    rpc GetBlockByHashes(ReqHashes) returns (BlockDetails) {}
+
+    //  block seq      blocks hash
+    rpc GetBlockBySeq(Int64) returns (BlockSeq) {}
+
+    //  dplatformos
+    rpc CloseQueue(ReqNil) returns (Reply) {}
+
+    //
+    rpc GetAllExecBalance(ReqAllExecBalance) returns (AllExecBalance) {}
+    //
+    rpc SignRawTx(ReqSignRawTx) returns (ReplySignRawTx) {}
+
+    rpc CreateNoBalanceTransaction(NoBalanceTx) returns (ReplySignRawTx) {}
+
+    //     HASH
+    rpc QueryRandNum(ReqRandHash) returns (ReplyHash) {}
+
+    //       fork
+    rpc GetFork(ReqKey) returns (Int64) {}
+
+    rpc CreateNoBalanceTxs(NoBalanceTxs) returns (ReplySignRawTx) {}
+
+    //  seq  title
+    rpc GetParaTxByTitle(ReqParaTxByTitle) returns (ParaTxDetails) {}
+
+    //     title
+    rpc LoadParaTxByTitle(ReqHeightByTitle) returns (ReplyHeightByTitle) {}
+
+    //        +title
+    rpc GetParaTxByHeight(ReqParaTxByHeight) returns (ParaTxDetails) {}
+
+    //
+    rpc GetHeaders(ReqBlocks) returns (Headers) {}
+}

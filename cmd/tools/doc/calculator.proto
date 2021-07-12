@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package types;
+// calculator
+message CalculatorAction {
+    oneof value {
+        Add      add = 1;
+        Subtract sub = 2;
+        Multiply mul = 3;
+        Divide   div = 4;
+    }
+    int32 ty = 5;
+}
+
+message Add {
+    int32 summand = 1; //
+    int32 addend  = 2; //
+}
+message AddLog {
+    int32 sum = 1; //
+}
+
+message Subtract {
+    int32 minuend    = 1; //
+    int32 subtrahend = 2; //
+}
+message SubLog {
+    int32 remainder = 1; //
+}
+
+message Multiply {
+    int32 faciend    = 1; //
+    int32 multiplier = 2; //
+}
+message MultiplyLog {
+    int32 product = 1; //
+}
+
+message Divide {
+    int32 dividend = 1; //
+    int32 divisor  = 2; //
+}
+message DivideLog {
+    int32 quotient = 1; //
+    int32 remain   = 2; //
+}
+
+message ReqQueryCalcCount {
+    string action = 1;
+}
+message ReplyQueryCalcCount {
+    int32 count = 1;
+}
+
+service calculator {
+    rpc QueryCalcCount(ReqQueryCalcCount) returns (ReplyQueryCalcCount) {}
+}

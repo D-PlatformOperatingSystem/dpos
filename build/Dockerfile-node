@@ -1,0 +1,13 @@
+FROM ubuntu:16.04
+
+WORKDIR /data
+
+RUN mkdir -p /etc/dom/dplatform
+ADD  ./dplatform /usr/local/bin
+ADD  ./dplatform-cli /usr/local/bin
+ADD  ./dplatform.toml /etc/dom/dplatform
+
+EXPOSE 13802
+
+CMD ["dplatform", "-f", "/etc/dom/dplatform/dplatform.toml", "-datadir", "/data"]
+

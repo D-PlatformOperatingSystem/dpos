@@ -1,0 +1,399 @@
+syntax = "proto3";
+
+import "transaction.proto";
+import "common.proto";
+import "blockchain.proto";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+service p2pgservice {
+    //
+    rpc BroadCastTx(P2PTx) returns (Reply) {}
+    //
+    rpc BroadCastBlock(P2PBlock) returns (Reply) {}
+
+    // PING
+    rpc Ping(P2PPing) returns (P2PPong) {}
+
+    //
+    rpc GetAddr(P2PGetAddr) returns (P2PAddr) {}
+
+    rpc GetAddrList(P2PGetAddr) returns (P2PAddrList) {}
+
+    //
+    rpc Version(P2PVersion) returns (P2PVerAck) {}
+    //  p2p
+    rpc Version2(P2PVersion) returns (P2PVersion) {}
+    //
+    rpc SoftVersion(P2PPing) returns (Reply) {}
+    //    ，  200
+    rpc GetBlocks(P2PGetBlocks) returns (P2PInv) {}
+
+    //  mempool
+    rpc GetMemPool(P2PGetMempool) returns (P2PInv) {}
+
+    //
+    rpc GetData(P2PGetData) returns (stream InvDatas) {}
+
+    //
+    rpc GetHeaders(P2PGetHeaders) returns (P2PHeaders) {}
+
+    //   peerinfo
+    rpc GetPeerInfo(P2PGetPeerInfo) returns (P2PPeerInfo) {}
+
+    // grpc server
+    rpc ServerStreamRead(stream BroadCastData) returns (ReqNil) {}
+
+    // grpc server
+    rpc ServerStreamSend(P2PPing) returns (stream BroadCastData) {}
+
+    // grpc   inpeers
+    rpc CollectInPeers(P2PPing) returns (PeerList) {}
+    rpc CollectInPeers2(P2PPing) returns (PeersReply) {}
+}
+
+/**
+ *
+ */
+message P2PGetPeerInfo {
+    /// p2p
+    int32 version = 1;
+}
+
+/**
+ *
+ */
+message P2PPeerInfo {
+    ///   IP
+    string addr = 1;
+    ///
+    int32 port = 2;
+    ///
+    string name = 3;
+    /// mempool
+    int32 mempoolSize = 4;
+    ///
+    Header header         = 5;
+    string version        = 6;
+    string localDBVersion = 7;
+    string storeDBVersion = 8;
+}
+
+/**
+ * p2p
+ */
+message P2PVersion {
+    ///
+    int32 version = 1;
+    ///
+    int64 service = 2;
+    ///
+    int64 timestamp = 3;
+    ///
+    string addrRecv = 4;
+    ///
+    string addrFrom = 5;
+    ///
+    int64 nonce = 6;
+    ///
+    string userAgent = 7;
+    ///
+    int64 startHeight = 8;
+}
+
+/**
+ * P2P
+ */
+message P2PVerAck {
+    int32 version = 1;
+    int64 service = 2;
+    int64 nonce   = 3;
+}
+
+/**
+ * P2P
+ */
+message P2PPing {
+    ///
+    int64 nonce = 1;
+    ///
+    string addr = 2;
+    ///
+    int32 port = 3;
+    //
+    Signature sign = 4;
+}
+
+/**
+ *
+ */
+message P2PPong {
+    int64 nonce = 1;
+}
+
+/**
+ *
+ */
+message P2PGetAddr {
+    int64 nonce = 1;
+}
+
+/**
+ *
+ */
+message P2PAddr {
+    int64 nonce = 1;
+    ///
+    repeated string addrlist = 2;
+}
+/**
+ *
+ **/
+
+message P2PAddrList {
+    int64    nonce                = 1;
+    repeated P2PPeerInfo peerinfo = 2;
+}
+
+/**
+ *
+ */
+message P2PExternalInfo {
+    ///
+    string addr = 1;
+    //
+    bool isoutside = 2;
+}
+
+/**
+ *
+ */
+message P2PGetBlocks {
+    int32 version     = 1;
+    int64 startHeight = 2;
+    int64 endHeight   = 3;
+}
+
+/**
+ *   mempool
+ */
+message P2PGetMempool {
+    int32 version = 1;
+}
+
+message P2PInv {
+    repeated Inventory invs = 1;
+}
+
+// ty=MSG_TX MSG_BLOCK
+message Inventory {
+    //  ，    ，MSG_TX MSG_BLOCK
+    int32 ty = 1;
+    ///
+    bytes hash = 2;
+    //
+    int64 height = 3;
+}
+
+/**
+ *   invs
+ */
+message P2PGetData {
+    /// p2p
+    int32 version = 1;
+    /// invs
+    repeated Inventory invs = 2;
+}
+
+//
+message P2PRoute {
+    int32 TTL = 1;
+}
+
+/**
+ * p2p
+ */
+message P2PTx {
+    Transaction tx    = 1;
+    P2PRoute    route = 2;
+}
+
+/**
+ * p2p
+ */
+message P2PBlock {
+    Block block = 1;
+}
+
+/**
+ * p2p      ,
+ */
+message LightBlock {
+
+    int64       size          = 1;
+    Header      header        = 2;
+    Transaction minerTx       = 3;
+    repeated string sTxHashes = 4;
+}
+
+//
+message LightTx {
+    bytes    txHash = 1;
+    P2PRoute route  = 2;
+}
+
+//
+message P2PTxReq {
+    bytes txHash = 1;
+}
+
+//
+message P2PBlockTxReq {
+    string   blockHash       = 1;
+    repeated int32 txIndices = 2;
+}
+
+//
+message P2PBlockTxReply {
+    string   blockHash       = 1;
+    repeated int32 txIndices = 2;
+    repeated Transaction txs = 3;
+}
+
+/*          hash,
+ *         ,
+ *
+ */
+message P2PQueryData {
+    oneof value {
+        P2PTxReq      txReq      = 1;
+        P2PBlockTxReq blockTxReq = 2;
+    }
+}
+/**
+ * p2p
+ */
+message Versions {
+    int32  p2pversion  = 1;
+    string softversion = 2;
+    string peername    = 3;
+}
+
+/**
+ * p2p
+ */
+message BroadCastData {
+    oneof value {
+        P2PTx           tx       = 1;
+        P2PBlock        block    = 2;
+        P2PPing         ping     = 3;
+        Versions        version  = 4;
+        LightTx         ltTx     = 5;
+        LightBlock      ltBlock  = 6;
+        P2PQueryData    query    = 7;
+        P2PBlockTxReply blockRep = 8;
+    }
+}
+
+/**
+ * p2p
+ */
+message P2PGetHeaders {
+    int32 version     = 1;
+    int64 startHeight = 2;
+    int64 endHeight   = 3;
+}
+
+/**
+ * p2p
+ */
+message P2PHeaders {
+    repeated Header headers = 1;
+}
+
+/**
+ * inv
+ */
+message InvData {
+    oneof value {
+        Transaction tx    = 1;
+        Block       block = 2;
+    }
+    int32 ty = 3;
+}
+
+/**
+ * inv
+ */
+message InvDatas {
+    repeated InvData items = 1;
+}
+
+/**
+ * peer
+ */
+message Peer {
+    string addr           = 1;
+    int32  port           = 2;
+    string name           = 3;
+    bool   self           = 4;
+    int32  mempoolSize    = 5;
+    Header header         = 6;
+    string version        = 7;
+    string localDBVersion = 8;
+    string storeDBVersion = 9;
+}
+
+/**
+ * peer
+ */
+message PeerList {
+    repeated Peer peers = 1;
+}
+
+/**
+ * p2p get peer req
+ */
+message P2PGetPeerReq {
+    string p2pType = 1;
+}
+
+/**
+ * p2p get net info req
+ */
+message P2PGetNetInfoReq {
+    string p2pType = 1;
+}
+
+/**
+ *
+ */
+message NodeNetInfo {
+    string externaladdr = 1;
+    string localaddr    = 2;
+    bool   service      = 3;
+    int32  outbounds    = 4;
+    int32  inbounds     = 5;
+    int32  routingtable = 6;
+    int32  peerstore    = 7;
+    string ratein       = 8;
+    string rateout      = 9;
+    string ratetotal    = 10;
+}
+
+/**
+ * p2p
+ */
+
+message PeersReply {
+    repeated PeersInfo peers = 1;
+}
+
+message PeersInfo {
+    string name        = 1;
+    string ip          = 2;
+    int32  port        = 3;
+    string softversion = 4;
+    int32  p2pversion  = 5;
+}

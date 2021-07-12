@@ -1,0 +1,184 @@
+Title="dplatformos"
+TestNet=true
+FixTime=false
+TxHeight=true
+
+[log]
+#     ，  debug(dbug)/info/warn/error(eror)/crit
+loglevel = "debug"
+logConsoleLevel = "info"
+#      ，    ，
+logFile = "logs/dplatformos.log"
+#           （  ： ）
+maxFileSize = 300
+#
+maxBackups = 100
+#            （  ： ）
+maxAge = 28
+#              （    UTC  ）
+localTime = true
+#           （     gz）
+compress = true
+#
+callerFile = false
+#
+callerFunction = false
+
+
+[blockchain]
+defCacheSize=128
+maxFetchBlockNum=128
+timeoutSeconds=5
+batchBlockNum=128
+driver="leveldb"
+dbPath="datadir"
+dbCache=64
+isStrongConsistency=false
+singleMode=false
+batchsync=false
+isRecordBlockSequence=true
+isParaChain=false
+enableTxQuickIndex=false
+
+[p2p]
+enable=true
+driver="leveldb"
+dbPath="datadir/addrbook"
+dbCache=4
+grpcLogFile="grpc.log"
+
+[p2p.sub.dht]
+
+
+[rpc]
+jrpcBindAddr="localhost:28803"
+grpcBindAddr="localhost:28804"
+whitelist=["127.0.0.1"]
+jrpcFuncWhitelist=["*"]
+grpcFuncWhitelist=["*"]
+
+[mempool]
+poolCacheSize=10240
+#          ，       ，  ，   0.0001 coins
+minTxFeeRate=10000
+#          , 0.1 coins
+maxTxFeeRate=1000000
+#           , 10 coins
+maxTxFee=100000000
+maxTxNumPerAccount=10000
+
+[consensus]
+name="ticket"
+minerstart=true
+
+[mver.consensus.sub.ticket]
+coinReward = 18
+coinDevFund = 12
+ticketPrice = 10000
+powLimitBits = "0x1f00ffff"
+retargetAdjustmentFactor = 4
+futureBlockTime = 16
+ticketFrozenTime = 5    #5s only for test
+ticketWithdrawTime = 10 #10s only for test
+ticketMinerWaitTime = 2 #2s only for test
+maxTxNumber = 1600      #160
+targetTimespan = 2304
+targetTimePerBlock = 16
+
+[mver.consensus.sub.ticket.ForkBlockHash]
+maxTxNumber = 10000
+targetTimespan = 288 #only for test
+targetTimePerBlock = 2
+powLimitBits = "0x1f2fffff"
+
+
+[store]
+name="mavl"
+driver="leveldb"
+dbPath="datadir/mavltree"
+dbCache=128
+
+[store.sub.mavl]
+enableMavlPrefix=false
+enableMVCC=false
+
+[store.sub.mavl2]
+enableMavlPrefix=false
+enableMVCC=false
+
+[wallet]
+minFee=100000
+driver="leveldb"
+dbPath="wallet"
+dbCache=16
+signType="secp256k1"
+
+[wallet.sub.ticket]
+minerdisable=false
+minerwhitelist=["*"]
+
+[exec]
+#        mempool   0
+enableStat=false
+enableMVCC=false
+alias=["token1:token","token2:token","token3:token"]
+saveTokenTxList=false
+
+[exec.sub.cert]
+#
+enable=false
+#
+cryptoPath="authdir/crypto"
+#        ，  "auth_ecdsa", "auth_sm2"
+signType="auth_ecdsa"
+
+#      fork,   dplatformos
+#
+[fork.system]
+ForkV1=75260
+ForkV3= 110000
+ForkBlockHash= 209186
+ForkV9= 350000
+ForkV12TransferExec= 408400
+ForkV13ExecKey= 408400
+ForkV14TxGroup= 408400
+ForkV15ResetTx0= 453400
+ForkV16Withdraw= 480000
+ForkV22ExecRollback= 706531
+ForkV23TxHeight= 806578
+ForkV24TxGroupPara= 806578
+ForkStateDBSet=-1
+
+[fork.sub.manage]
+Enable=120000
+ForkV11ManageExec= 400000
+
+[fork.sub.retrive]
+Enable=0
+ForkRetrive= 180000
+
+[fork.sub.token]
+Enable=100899
+ForkTokenBlackList= 190000
+ForkBadTokenSymbol= 184000
+ForkTokenPrice= 560000
+
+[fork.sub.trade]
+Enable=100899
+ForkTradeBuyLimit= 301000
+ForkV27TradeAsset= 1010000
+
+[fork.sub.evm]
+Enable=500000
+ForkEVMState= 650000
+ForkEVMKVHash= 1000000
+
+[fork.sub.relay]
+Enable=570000
+
+[fork.sub.privacy]
+Enable=980000
+
+[fork.sub.blackwhite]
+Enable=850000
+ForkBlackWhiteV2= 900000

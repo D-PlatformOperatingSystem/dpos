@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package types;
+option go_package = "github.com/D-PlatformOperatingSystem/dpos/types";
+
+// Account
+message Account {
+    // coins  ，    0
+    int32 currency = 1;
+    //
+    int64 balance = 2;
+    //
+    int64 frozen = 3;
+    //
+    string addr = 4;
+}
+
+//             （   ）
+message ReceiptExecAccountTransfer {
+    //
+    string execAddr = 1;
+    //
+    Account prev = 2;
+    //
+    Account current = 3;
+}
+
+//             （coins ）
+message ReceiptAccountTransfer {
+    //
+    Account prev = 1;
+    //
+    Account current = 2;
+}
+
+//
+message ReceiptAccountMint {
+    //
+    Account prev = 1;
+    //
+    Account current = 2;
+}
+
+message ReceiptAccountBurn {
+    Account prev    = 1;
+    Account current = 2;
+}
+
+//
+message ReqBalance {
+    //
+    repeated string addresses = 1;
+    //
+    string execer       = 2;
+    string stateHash    = 3;
+    string asset_exec   = 4;
+    string asset_symbol = 5;
+}
+
+// Account
+message Accounts {
+    repeated Account acc = 1;
+}
+
+message ExecAccount {
+    string  execer  = 1;
+    Account account = 2;
+}
+
+message AllExecBalance {
+    string   addr                    = 1;
+    repeated ExecAccount ExecAccount = 2;
+}
+
+message ReqAllExecBalance {
+    //
+    string addr = 1;
+    //
+    string execer       = 2;
+    string stateHash    = 3;
+    string asset_exec   = 4;
+    string asset_symbol = 5;
+}

@@ -1,0 +1,28 @@
+
+
+
+#######         ，    autotest ，
+
+
+#dplatformos
+cliCmd = "./dplatformos-cli"
+#                ，
+checkTimeout = 60
+
+[[TestCaseFile]]
+dapp = "coins"
+filename = "coins.toml"
+
+[[TestCaseFile]]
+dapp = "token"
+filename = "token.toml"
+
+[[TestCaseFile]]
+dapp = "trade"
+filename = "trade.toml"
+
+
+[[TestCaseFile]]
+dapp = "privacy"
+filename = "privacy.toml"
+

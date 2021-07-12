@@ -1,0 +1,21 @@
+syntax = "proto3";
+package ticket;
+
+message Ticket {
+    string ticketId = 1;
+    // 0 ->     1 ->     2 ->      3->
+    int32 status = 2;
+    // genesis
+    bool isGenesis = 3;
+    //
+    int64 createTime = 4;
+    //
+    int64 minerTime = 5;
+    //
+    int64  minerValue   = 8;
+    string minerAddress = 6;
+    // return wallet
+    string returnAddress = 7;
+    // miner Price
+    int64 price = 9;
+}

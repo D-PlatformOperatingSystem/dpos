@@ -1,0 +1,137 @@
+// Copyright D-Platform Corp. 2018 All Rights Reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package dapp
+
+//store package store the world - state data
+import (
+	"github.com/D-PlatformOperatingSystem/dpos/client"
+	"github.com/D-PlatformOperatingSystem/dpos/common/address"
+	log "github.com/D-PlatformOperatingSystem/dpos/common/log/log15"
+	"github.com/D-PlatformOperatingSystem/dpos/types"
+)
+
+var elog = log.New("module", "execs")
+
+// DriverCreate defines a drivercreate function
+type DriverCreate func() Driver
+
+type driverWithHeight struct {
+	create DriverCreate
+	height int64
+}
+
+var (
+	execDrivers        = make(map[string]*driverWithHeight)
+	execAddressNameMap = make(map[string]string)
+	registedExecDriver = make(map[string]*driverWithHeight)
+)
+
+// Register register dcriver height in name
+func Register(cfg *types.DplatformOSConfig, name string, create DriverCreate, height int64) {
+	if cfg == nil {
+		panic("Execute: GetConfig is nil")
+	}
+	if create == nil {
+		panic("Execute: Register driver is nil")
+	}
+	if _, dup := registedExecDriver[name]; dup {
+		panic("Execute: Register called twice for driver " + name)
+	}
+	driverHeight := &driverWithHeight{
+		create: create,
+		height: height,
+	}
+	registedExecDriver[name] = driverHeight
+	//                 (             )，        (    )
+	registerAddress(name)
+	execDrivers[ExecAddress(name)] = driverHeight
+
+	if cfg.IsPara() {
+		paraHeight := cfg.GetFork("ForkEnableParaRegExec")
+		if paraHeight < height {
+			paraHeight = height
+		}
+		//           user.p.x.name
+		paraDriverName := cfg.ExecName(name)
+		registerAddress(paraDriverName)
+		execDrivers[ExecAddress(paraDriverName)] = &driverWithHeight{
+			create: create,
+			height: paraHeight,
+		}
+	}
+}
+
+// LoadDriver load driver
+func LoadDriver(name string, height int64) (driver Driver, err error) {
+	// user.evm.xxxx    ，  evm
+	//   user.p.evm
+	name = string(types.GetRealExecName([]byte(name)))
+	c, ok := registedExecDriver[name]
+	if !ok {
+		elog.Debug("LoadDriver", "driver", name)
+		return nil, types.ErrUnRegistedDriver
+	}
+	if height >= c.height || height == -1 {
+		return c.create(), nil
+	}
+	return nil, types.ErrUnknowDriver
+}
+
+//LoadDriverWithClient load
+func LoadDriverWithClient(qclent client.QueueProtocolAPI, name string, height int64) (driver Driver, err error) {
+	driver, err = LoadDriver(name, height)
+	if err != nil {
+		return nil, err
+	}
+	driver.SetAPI(qclent)
+	return driver, nil
+}
+
+// LoadDriverAllow load driver allow
+func LoadDriverAllow(qclent client.QueueProtocolAPI, tx *types.Transaction, index int, height int64) (driver Driver) {
+	exec, err := LoadDriverWithClient(qclent, string(tx.Execer), height)
+	if err == nil {
+		exec.SetEnv(height, 0, 0)
+		err = exec.Allow(tx, index)
+	}
+	if err != nil {
+		exec, err = LoadDriverWithClient(qclent, "none", height)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		exec.SetName(string(types.GetRealExecName(tx.Execer)))
+		exec.SetCurrentExecName(string(tx.Execer))
+	}
+	return exec
+}
+
+// IsDriverAddress whether or not execdrivers by address
+func IsDriverAddress(addr string, height int64) bool {
+	c, ok := execDrivers[addr]
+	if !ok {
+		return false
+	}
+	if height >= c.height || height == -1 {
+		return true
+	}
+	return false
+}
+
+func registerAddress(name string) {
+	if len(name) == 0 {
+		panic("empty name string")
+	}
+	addr := ExecAddress(name)
+	execAddressNameMap[name] = addr
+}
+
+// ExecAddress return exec address
+func ExecAddress(name string) string {
+	if addr, ok := execAddressNameMap[name]; ok {
+		return addr
+	}
+	return address.ExecAddress(name)
+}

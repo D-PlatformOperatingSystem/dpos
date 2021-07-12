@@ -1,0 +1,9 @@
+FROM ubuntu:16.04
+
+WORKDIR /root
+COPY dplatform ./
+COPY dplatform-cli ./
+COPY autotest ./
+COPY *.toml ./
+
+CMD ["/root/dplatform", "-f", "/root/dplatform.toml"]

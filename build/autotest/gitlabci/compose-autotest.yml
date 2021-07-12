@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  autotest:
+    build:
+      context: .
+      dockerfile: Dockerfile-autotest
+    container_name: autotest-dplatformos
+
+  chain32:
+    build:
+      context: .
+      dockerfile: Dockerfile-autotest
+    container_name: autotest-chain32
+
+
